@@ -14,7 +14,7 @@ async function getPrice(itemUrl = DEFAULT_ITEM_URL) {
   try {
     const context = await browser.newContext();
     const page = await context.newPage();
-    stopCookieWatcher = startCookieConsentWatcher(page);
+    // stopCookieWatcher = startCookieConsentWatcher(page);
 
     await page.goto(itemUrl, { waitUntil: 'domcontentloaded' });
     // Banners are commonly injected after the initial page load. Wait long
@@ -38,26 +38,27 @@ async function getPrice(itemUrl = DEFAULT_ITEM_URL) {
     );
 
     const prices = await page.evaluate(() => {
-      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const targetPx = rootFontSize * 2.4;
-      const tolerance = 0.5; // guard against sub-pixel rounding
-
+      const spans = document.querySelectorAll('span');
       const matches = [];
-      const re = /₹\s?[\d,]+(?:\.\d+)?/g;
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      let node;
-      while ((node = walker.nextNode())) {
-        const text = node.nodeValue;
+      const re = /₹\s?[\d,]+(?:\.\d+)?/;
+
+      for (const el of spans) {
+        const text = el.textContent;
+        console.log(text);
         if (!text || !text.includes('₹')) continue;
 
-        const el = node.parentElement;
-        if (!el) continue;
+        // Inline style attributes are consistent per your sample even though
+        // the class name is randomized; opacity varies so we ignore it.
+        const fontFamily = el.style.fontFamily;
+        const fontSize = el.style.fontSize;
 
-        const fontSizePx = parseFloat(getComputedStyle(el).fontSize);
-        if (Math.abs(fontSizePx - targetPx) > tolerance) continue;
+        const isSerif = fontFamily.includes('--serif');
+        const is2_4rem = fontSize === '2.4rem';
 
-        const found = text.match(re);
-        if (found) matches.push(...found);
+        if (isSerif && is2_4rem) {
+          const found = text.match(re);
+          if (found) matches.push(found[0]);
+        }
       }
       return matches;
     });
