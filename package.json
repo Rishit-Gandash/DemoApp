@@ -1,0 +1,20 @@
+{
+  "name": "demoapp",
+  "version": "1.0.0",
+  "description": "demo app for ine",
+  "license": "MIT",
+  "author": "Rishit Gandash",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "run": "run"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "typescript-language-server": "^6.0.1"
+  },
+  "dependencies": {
+    "playwright": "^1.63.0"
+  }
+}
