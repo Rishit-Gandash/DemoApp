@@ -16,5 +16,13 @@
   },
   "dependencies": {
     "playwright": "^1.63.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rishit-Gandash/DemoApp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Rishit-Gandash/DemoApp/issues"
+  },
+  "homepage": "https://github.com/Rishit-Gandash/DemoApp#readme"
 }

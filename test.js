@@ -1,14 +1,13 @@
 const { chromium } = require('playwright');
 
-const DEFAULT_ITEM_URL = 'https://demo.inelabteamdev.com/item/2030';
 const PRICE_BUTTON = 'button[aria-label="Check today’s price"]';
 
 /**
  * Fetch the quote shown after pressing the item's price button.
  * Run with: node fetch_price.js <item-page-url>
  */
-async function getPrice(itemUrl = DEFAULT_ITEM_URL) {
-  const browser = await chromium.launch({ headless: true});
+async function getPrice(itemUrl) {
+  const browser = await chromium.launch({ headless: false});
 
   try {
     const context = await browser.newContext();
@@ -192,8 +191,6 @@ function parsePrice(debug) {
   i++;
 
   let intPart = "";
-  let decPart = "";
-  let sawDecimal = false;
 
   while (debug.slice(i, i + 6) !== "strong") { // see note below
     if (i + 6 > debug.length) {
@@ -204,8 +201,7 @@ function parsePrice(debug) {
     if (ch === ".") {
       break;
     } else if ("0123456789".includes(ch)) {
-      if (sawDecimal) decPart += ch;
-      else intPart += ch;
+        intPart += ch;
     }
     i++;
   }
