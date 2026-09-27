@@ -75,3 +75,8 @@ Every scrape attempt — success, retried, or failed — is written to the log t
 ## AI Tool Usage
 
 AI tools (claude and codex) were used however each line of code was carefully read and understood and only then pushed. Much of the crawler logic was rewritten many times by hand.
+
+## TODO
+- Make scraper logic robust
+- Host the backend on Render
+- Change detection that flags when the page's structure changes
