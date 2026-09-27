@@ -1,79 +1,83 @@
 const { chromium } = require('playwright');
 
-const DEFAULT_ITEM_URL = 'https://demo.inelabteamdev.com/item/2276';
+
+
+const DEFAULT_ITEM_URL = 'https://demo.inelabteamdev.com/item/2030';
 const PRICE_BUTTON = 'button[aria-label="Check today’s price"]';
 
-/**
- * Fetch the quote shown after pressing the item's price button.
- * Run with: node fetch_price.js <item-page-url>
- */
-async function getPrice(itemUrl = DEFAULT_ITEM_URL) {
-  const browser = await chromium.launch({ headless: false });
+
+async function selectOption(page, optionLabel) {
+  const picker = page.locator('.opt-picker');
+  await picker.waitFor({ state: 'visible', timeout: 10_000 });
+
+  // The axis name (Level/Storage/Capacity/etc.) varies by product, so match
+  // on the button's own text, not the group's aria-label.
+  const chip = picker.getByRole('button', { name: optionLabel, exact: true });
+  await chip.waitFor({ state: 'visible', timeout: 5_000 });
+
+  const alreadySelected = (await chip.getAttribute('aria-pressed')) === 'true';
+  if (alreadySelected) return;
+
+  await chip.click({ timeout: 5_000 });
+
+  // Confirm the click actually registered before moving on — don't assume.
+  await page.waitForFunction(
+    (label) => {
+      const btn = [...document.querySelectorAll('.opt-picker .opt-chip')]
+        .find((el) => el.textContent.trim() === label);
+      return btn?.getAttribute('aria-pressed') === 'true';
+    },
+    optionLabel,
+    { timeout: 5_000 },
+  );
+}
+
+
+async function getPrice(browser, itemUrl, optionLabel) {
+
   let stopCookieWatcher = () => {};
+  let context;
 
   try {
-    const context = await browser.newContext();
+    context = await browser.newContext();
     const page = await context.newPage();
-    // stopCookieWatcher = startCookieConsentWatcher(page);
-
+    stopCookieWatcher = startCookieConsentWatcher(page);
     await page.goto(itemUrl, { waitUntil: 'domcontentloaded' });
     // Banners are commonly injected after the initial page load. Wait long
-    // enough for one to appear; the watcher below continues through the rest
+    // enough for one to appear; the watcher above continues through the rest
     // of the workflow in case it appears even later.
     await dismissCookieConsent(page, { timeout: 6_000 });
 
-    // Start waiting before clicking: the quote request can be very fast.
-    const quotePromise = page.waitForResponse(
-      (response) =>
-        response.request().method() === 'GET' &&
-        /\/api\/v2\/items\/\d+\/quote(?:\?|$)/.test(response.url()),
-      { timeout: 15_000 },
-    );
-
+    await selectOption(page, optionLabel);
     await activatePriceButton(page);
 
-    await page.waitForFunction(
-      () => document.body.innerText.includes('₹'),
-      { timeout: 10_000 },
-    );
+    await page.waitForSelector('.offer-row', { timeout: 10_000 });
 
-    const prices = await page.evaluate(() => {
-      const spans = document.querySelectorAll('span');
-      const matches = [];
-      const re = /₹\s?[\d,]+(?:\.\d+)?/;
 
-      for (const el of spans) {
-        const text = el.textContent;
-        console.log(text);
-        if (!text || !text.includes('₹')) continue;
 
-        // Inline style attributes are consistent per your sample even though
-        // the class name is randomized; opacity varies so we ignore it.
-        const fontFamily = el.style.fontFamily;
-        const fontSize = el.style.fontSize;
 
-        const isSerif = fontFamily.includes('--serif');
-        const is2_4rem = fontSize === '2.4rem';
 
-        if (isSerif && is2_4rem) {
-          const found = text.match(re);
-          if (found) matches.push(found[0]);
-        }
-      }
-      return matches;
+    const debug = await page.evaluate(() => {
+      const offerRow = document.querySelector('.offer-row');
+      return offerRow ? offerRow.outerHTML : null;
     });
 
+    console.log(debug);
+
+
+    const price = parsePrice(debug);
+    // const price = await getPriceFromOfferRow(page);
     const stock = await getStock(page);
 
+    console.log("price: " + price);
+    console.log("stock: " + stock);
     return {
-      price: prices[0] ?? null,
-      discountedPrice: prices.length > 1 ? prices[1] : null,
-      raw: prices,
-      stock
+        price: price,
+      stock: stock,
     };
   } finally {
-    // stopCookieWatcher();
-    // await browser.close();
+    stopCookieWatcher();
+    await context?.close();
   }
 }
 
@@ -104,66 +108,76 @@ async function activatePriceButton(page) {
     );
     await page.waitForTimeout(70);
   }
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(600);
 
   // This waits for the now-enabled button and performs a trusted click.
   await button.click({ timeout: 5_000 });
 }
 
-function startCookieConsentWatcher(page) {
-  let checking = false;
-  const check = async () => {
-    if (checking || page.isClosed()) return;
-    checking = true;
-    try {
-      await dismissCookieConsent(page, { timeout: 0 });
-    } catch {
-      // A navigation or closed page can race the background check.
-    } finally {
-      checking = false;
-    }
-  };
 
-  const interval = setInterval(() => void check(), 250);
-  void check();
-  return () => clearInterval(interval);
-}
 
 async function dismissCookieConsent(page, { timeout = 0 } = {}) {
-  // Consent providers differ wildly; use specific IDs first, then accessible
-  // button names. Check every frame because many CMPs render in an iframe.
   const selectors = [
-    '#onetrust-accept-btn-handler',
-    '#onetrust-reject-all-handler',
-    '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
-    '#CybotCookiebotDialogBodyButtonDecline',
-    '[data-testid="cookie-accept"]',
-    '[data-testid="cookie-reject"]',
-    '[data-testid="uc-accept-all-button"]',
-    '[aria-label*="accept cookies" i]',
-    '[aria-label*="reject cookies" i]',
-    '[id*="cookie"][id*="accept" i]',
-    '[id*="cookie"][id*="reject" i]',
+    '.consent-box [aria-label="Allow cookies"]',
+    '.consent-box [aria-label="Reject cookies"]',
+    '.consent-box .ctl-main',
+    '.consent-box .ctl-plain',
   ];
-  const names = [
-    /^(accept|accept all|accept cookies|allow all|agree|i agree|yes|ok|got it)$/i,
-    /^(reject|reject all|reject cookies|decline|deny|no|necessary only)$/i,
-  ];
-
   const deadline = Date.now() + timeout;
+
   do {
-    for (const frame of page.frames()) {
-      for (const selector of selectors) {
-        if (await clickIfVisible(frame.locator(selector).first())) return;
-      }
-      for (const name of names) {
-        if (await clickIfVisible(frame.getByRole('button', { name, exact: true }).first())) return;
-      }
+    for (const selector of selectors) {
+      if (await clickIfVisible(page.locator(selector).first())) return;
     }
     if (Date.now() < deadline) await page.waitForTimeout(100);
   } while (Date.now() < deadline);
 }
 
+// async function dismissCookieConsent(page, { timeout = 0 } = {}) {
+//   const selector = '.consent-box [aria-label="Allow cookies"]';
+//   const deadline = Date.now() + timeout;
+//
+//   do {
+//     if (await clickIfVisible(page.locator(selector).first())) return;
+//     if (Date.now() < deadline) await page.waitForTimeout(100);
+//   } while (Date.now() < deadline);
+// }
+
+// async function dismissCookieConsent(page, { timeout = 0 } = {}) {
+//   // Consent providers differ wildly; use specific IDs first, then accessible
+//   // button names. Check every frame because many CMPs render in an iframe.
+//   const selectors = [
+//     '#onetrust-accept-btn-handler',
+//     '#onetrust-reject-all-handler',
+//     '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
+//     '#CybotCookiebotDialogBodyButtonDecline',
+//     '[data-testid="cookie-accept"]',
+//     '[data-testid="cookie-reject"]',
+//     '[data-testid="uc-accept-all-button"]',
+//     '[aria-label*="accept cookies" i]',
+//     '[aria-label*="reject cookies" i]',
+//     '[id*="cookie"][id*="accept" i]',
+//     '[id*="cookie"][id*="reject" i]',
+//   ];
+//   const names = [
+//     /^(accept|accept all|accept cookies|allow all|agree|i agree|yes|ok|got it)$/i,
+//     /^(reject|reject all|reject cookies|decline|deny|no|necessary only)$/i,
+//   ];
+//
+//   const deadline = Date.now() + timeout;
+//   do {
+//     for (const frame of page.frames()) {
+//       for (const selector of selectors) {
+//         if (await clickIfVisible(frame.locator(selector).first())) return;
+//       }
+//       for (const name of names) {
+//         if (await clickIfVisible(frame.getByRole('button', { name, exact: true }).first())) return;
+//       }
+//     }
+//     if (Date.now() < deadline) await page.waitForTimeout(100);
+//   } while (Date.now() < deadline);
+// }
+//
 async function clickIfVisible(locator) {
   try {
     if (await locator.isVisible()) {
@@ -175,6 +189,7 @@ async function clickIfVisible(locator) {
   }
   return false;
 }
+
 async function getStock(page) {
   return page.evaluate(() => {
     const soldOut = document.querySelector('.avail-pill.avail-no');
@@ -190,13 +205,125 @@ async function getStock(page) {
   });
 }
 
+
+
+function countSpan(debug) {
+    let i = 0;
+    let count = 0;
+    while(i + 4 < debug.length){
+        if(debug.slice(i, i + 4) === "span") {
+            count++;
+        }
+        i++;
+    }
+    return count;
+}
+
+
+function parseSpan(debug, endTerm) {
+  let i = 0;
+  while (debug.slice(i, i + 6) !== "2.4rem") {
+    if (i + 6 > debug.length) {
+      console.log("error: couldn't find dpe in string");
+      return null;
+    }
+    i++;
+  }
+
+  while (debug[i] !== ">") {
+    if (i > debug.length) {
+      console.log("error: couldn't find end of tag in string");
+      return null;
+    }
+    i++;
+  }
+  i++;
+
+  let intPart = "";
+  let n = endTerm.length;
+
+  while (debug.slice(i, i + n) !== endTerm) { 
+    if (i + 6 > debug.length) {
+      console.log("error: couldn't find closing term in string");
+      return null;
+    }
+    const ch = debug[i].normalize("NFKC");
+    if (ch === ".") {
+      break;
+    } else if ("0123456789".includes(ch)) {
+        intPart += ch;
+    }
+    i++;
+  }
+
+  const whole = Number(intPart);
+  return whole
+}
+
+function parsePrice(debug) {
+  const no_span = countSpan(debug);
+  if(no_span > 15) { // Multiple spans, likely ends with <span class =
+    return parseSpan(debug, "<span class");
+  } else {
+    return parseSpan(debug, "</span>");
+  }
+}
+
+function startCookieConsentWatcher(page) {
+  let checking = false;
+  const check = async () => {
+    if (checking || page.isClosed()) return;
+    checking = true;
+    try {
+      await dismissCookieConsent(page, { timeout: 0 });
+    } catch {
+      // A navigation or closed page can race the background check.
+    } finally {
+      checking = false;
+    }
+  };
+ 
+  const interval = setInterval(() => void check(), 250);
+  void check();
+  return () => clearInterval(interval);
+}
+
 if (require.main === module) {
-  getPrice(process.argv[2] || DEFAULT_ITEM_URL)
-    .then((quote) => console.log(quote))
-    .catch((error) => {
+  (async () => {
+    const browser = await chromium.launch({ headless: false});
+    try {
+      const result = await getPrice(browser, DEFAULT_ITEM_URL, 'Starter');
+      console.log(result);
+    } catch (error) {
       console.error(error.message);
       process.exitCode = 1;
-    });
+    } finally {
+      await browser.close();
+    }
+  })();
 }
+
+async function getPriceFromOfferRow(page) {
+  const rawText = await page.evaluate(() => {
+    const el = document.querySelector('.dpe-n6');
+    return el ? el.textContent : null;
+  });
+
+  return parsePrice(rawText);
+}
+
+// function parsePrice(rawText) {
+//   if (!rawText) return null;
+//
+//   // Strip currency prefix, non-breaking spaces, and thousands separators —
+//   // e.g. "Rs.\u00a027,749.00" -> "27749.00"
+//   const cleaned = rawText.replace(/[^\d.]/g, '');
+//   if (!cleaned) return null;
+//
+//   const value = Number(cleaned);
+//   return Number.isFinite(value) ? value : null;
+// }
+
+
 
 module.exports = { getPrice, dismissCookieConsent, activatePriceButton };
