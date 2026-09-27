@@ -289,30 +289,30 @@ async function runCrawl() {
       console.log('Fetching listings...');
       listings = await fetchAllListings();
       console.log(`Found ${listings.length} items across all pages.`);
-      // // fs.writeFileSync('listings.json', JSON.stringify(listings, null, 2));
-      // console.log('Wrote listings.json');
+      fs.writeFileSync('listings.json', JSON.stringify(listings, null, 2));
+      console.log('Wrote listings.json');
     }
-
-    // const browser = await getBrowser();
-    // const limit = pLimit(5);
-    //
-    // await Promise.all(
-    //   listings.map((listing) =>
-    //     limit(async () => {
-    //       const activeBrowser = browser.isConnected() ? browser : await getBrowser();
-    //       await processItem(activeBrowser, listing, stats);
-    //     })
-    //   )
-    // );
-
 
     const browser = await getBrowser();
+    const limit = pLimit(3);
 
-    for (const listing of listings) {
-      const activeBrowser = browser.isConnected() ? browser : await getBrowser();
-      await processItem(activeBrowser, listing, stats);
-    }
+    await Promise.all(
+      listings.map((listing) =>
+        limit(async () => {
+          const activeBrowser = browser.isConnected() ? browser : await getBrowser();
+          await processItem(activeBrowser, listing, stats);
+        })
+      )
+    );
 
+
+    // const browser = await getBrowser();
+    //
+    // for (const listing of listings) {
+    //   const activeBrowser = browser.isConnected() ? browser : await getBrowser();
+    //   await processItem(activeBrowser, listing, stats);
+    // }
+    //
     await finishCrawlRun(runId, { ...stats, status: 'completed' });
     console.log('Crawl completed:', stats);
   } catch (err) {

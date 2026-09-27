@@ -262,11 +262,32 @@ function parseSpan(debug, endTerm) {
 
 function parsePrice(debug) {
   const no_span = countSpan(debug);
-  if(no_span > 15) { // Multiple spans, likely ends with <span class =
-    return parseSpan(debug, "<span class");
-  } else {
-    return parseSpan(debug, "</span>");
+  console.log(no_span);
+  let n = parseSpan(debug, "<span class");
+  if(n > 100 && n < 1000000){
+    return n;
   }
+  n = parseSpan(debug, "<span style");
+  if(n > 100 && n < 1000000){
+    return n;
+  }
+  n = parseSpan(debug, "</b>");
+  if(n > 100 && n < 1000000){
+    return n;
+  }
+  n = parseSpan(debug, "</div>");
+  if(n > 100 && n < 1000000){
+    return n;
+  }
+  n = parseSpan(debug, "</strong>");
+  if(n > 100 && n < 1000000){
+    return n;
+  }
+  n = parseSpan(debug, "</span>");
+  if(n > 100 && n < 1000000){
+    return n;
+  }
+  return null;
 }
 
 function startCookieConsentWatcher(page) {

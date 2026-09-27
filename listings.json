@@ -1,0 +1,182 @@
+[
+  {
+    "id": 2401,
+    "slug": "halvard-mirrorless-camera-flex",
+    "name": "Halvard Mirrorless Camera Flex",
+    "brand": "Halvard",
+    "category": "Cameras",
+    "sku": "SK-2401-HA",
+    "description": "The Halvard Mirrorless Camera Flex. A dependable cameras pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2541,
+    "slug": "halvard-massager-ultra",
+    "name": "Halvard Massager Ultra",
+    "brand": "Halvard",
+    "category": "Personal Care",
+    "sku": "SK-2541-HA",
+    "description": "The Halvard Massager Ultra. A dependable personal care pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2240,
+    "slug": "solvane-5g-hotspot-edge",
+    "name": "Solvane 5G Hotspot Edge",
+    "brand": "Solvane",
+    "category": "Networking",
+    "sku": "SK-2240-SO",
+    "description": "The Solvane 5G Hotspot Edge. A dependable networking pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2194,
+    "slug": "tundrel-sleeping-bag-edge",
+    "name": "Tundrel Sleeping Bag Edge",
+    "brand": "Tundrel",
+    "category": "Outdoor",
+    "sku": "SK-2194-TU",
+    "description": "The Tundrel Sleeping Bag Edge. A dependable outdoor pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2826,
+    "slug": "saffrix-yoga-mat-zen",
+    "name": "Saffrix Yoga Mat Zen",
+    "brand": "Saffrix",
+    "category": "Fitness",
+    "sku": "SK-2826-SA",
+    "description": "The Saffrix Yoga Mat Zen. A dependable fitness pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2870,
+    "slug": "solvane-violin-zen",
+    "name": "Solvane Violin Zen",
+    "brand": "Solvane",
+    "category": "Instruments",
+    "sku": "SK-2870-SO",
+    "description": "The Solvane Violin Zen. A dependable instruments pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2279,
+    "slug": "lumeno-hammock-core",
+    "name": "Lumeno Hammock Core",
+    "brand": "Lumeno",
+    "category": "Outdoor",
+    "sku": "SK-2279-LU",
+    "description": "The Lumeno Hammock Core. A dependable outdoor pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2178,
+    "slug": "redwick-handheld-console-edge",
+    "name": "Redwick Handheld Console Edge",
+    "brand": "Redwick",
+    "category": "Gaming",
+    "sku": "SK-2178-RE",
+    "description": "The Redwick Handheld Console Edge. A dependable gaming pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2892,
+    "slug": "redwick-kids-tablet-arc",
+    "name": "Redwick Kids Tablet Arc",
+    "brand": "Redwick",
+    "category": "Tablets",
+    "sku": "SK-2892-RE",
+    "description": "The Redwick Kids Tablet Arc. A dependable tablets pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2845,
+    "slug": "tamarack-filing-cabinet-zen",
+    "name": "Tamarack Filing Cabinet Zen",
+    "brand": "Tamarack",
+    "category": "Office",
+    "sku": "SK-2845-TA",
+    "description": "The Tamarack Filing Cabinet Zen. A dependable office pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2555,
+    "slug": "halvard-network-switch-ultra",
+    "name": "Halvard Network Switch Ultra",
+    "brand": "Halvard",
+    "category": "Networking",
+    "sku": "SK-2555-HA",
+    "description": "The Halvard Network Switch Ultra. A dependable networking pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2559,
+    "slug": "lumeno-nas-enclosure-ultra",
+    "name": "Lumeno NAS Enclosure Ultra",
+    "brand": "Lumeno",
+    "category": "Networking",
+    "sku": "SK-2559-LU",
+    "description": "The Lumeno NAS Enclosure Ultra. A dependable networking pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2122,
+    "slug": "redwick-standing-desk-go",
+    "name": "Redwick Standing Desk Go",
+    "brand": "Redwick",
+    "category": "Office",
+    "sku": "SK-2122-RE",
+    "description": "The Redwick Standing Desk Go. A dependable office pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2612,
+    "slug": "redwick-smart-panel-nano",
+    "name": "Redwick Smart Panel Nano",
+    "brand": "Redwick",
+    "category": "Lighting",
+    "sku": "SK-2612-RE",
+    "description": "The Redwick Smart Panel Nano. A dependable lighting pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2331,
+    "slug": "halvard-drawing-tablet-prime",
+    "name": "Halvard Drawing Tablet Prime",
+    "brand": "Halvard",
+    "category": "Tablets",
+    "sku": "SK-2331-HA",
+    "description": "The Halvard Drawing Tablet Prime. A dependable tablets pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2820,
+    "slug": "junova-arcade-stick-zen",
+    "name": "Junova Arcade Stick Zen",
+    "brand": "Junova",
+    "category": "Gaming",
+    "sku": "SK-2820-JU",
+    "description": "The Junova Arcade Stick Zen. A dependable gaming pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2768,
+    "slug": "tundrel-desk-organiser-aero",
+    "name": "Tundrel Desk Organiser Aero",
+    "brand": "Tundrel",
+    "category": "Office",
+    "sku": "SK-2768-TU",
+    "description": "The Tundrel Desk Organiser Aero. A dependable office pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2734,
+    "slug": "veloria-slate-aero",
+    "name": "Veloria Slate Aero",
+    "brand": "Veloria",
+    "category": "Tablets",
+    "sku": "SK-2734-VE",
+    "description": "The Veloria Slate Aero. A dependable tablets pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2688,
+    "slug": "solvane-desk-organiser-duo",
+    "name": "Solvane Desk Organiser Duo",
+    "brand": "Solvane",
+    "category": "Office",
+    "sku": "SK-2688-SO",
+    "description": "The Solvane Desk Organiser Duo. A dependable office pick with a clean, no-nonsense design and the everyday features you actually use."
+  },
+  {
+    "id": 2232,
+    "slug": "junova-synthesizer-edge",
+    "name": "Junova Synthesizer Edge",
+    "brand": "Junova",
+    "category": "Instruments",
+    "sku": "SK-2232-JU",
+    "description": "The Junova Synthesizer Edge. A dependable instruments pick with a clean, no-nonsense design and the everyday features you actually use."
+  }
+]
