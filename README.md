@@ -7,7 +7,7 @@ A small full-stack app that tracks 20 items from INE's demo mock store. A schedu
 <img width="1243" height="432" alt="image" src="https://github.com/user-attachments/assets/2dcb778c-f6e2-4bbe-99de-ee044f5b9751" />
 
 
-- **Backend**: Node/Express, deployed on Render. Exposes a protected endpoint that an external
+- **Backend** Node.js script running locally. Exposes a protected endpoint that an external
   cron service calls every 2 hours to trigger a scrape run, since the free-tier backend sleeps
   and can't run its own always-on scheduler.
 - **Scraping**: two-stage, described below.
